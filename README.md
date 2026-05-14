@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Life Quant Dashboard
 
-## Getting Started
+> Personal behavioral analytics platform. Track patterns, measure consistency, optimize compounding.
 
-First, run the development server:
+**This is NOT a habit tracker. This is a behavioral operating system.**
+
+---
+
+## Philosophy
+
+Life Quant Dashboard is built on a simple premise: **patterns matter more than streaks.**
+
+Most habit/gamification apps reward showing up. This system rewards showing up **and** doing quality work, revealing the correlations between domains that matter most to your performance.
+
+Tracked domains can include deep work, sleep, training, reading, mood, ICPC practice — anything you can measure numerically.
+
+## Quick Start
 
 ```bash
+git clone git@github.com:road2qnt/Project-001-Life-Quant-Dashboard.git
+cd Project-001-Life-Quant-Dashboard
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Documentation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- [Full Architecture Plan](./docs/ARCHITECTURE.md) — 25-point engineering & product design
+- [Agent Memory System](./docs/MEMORY-SYSTEM.md) — Persistent AI-native engineering context
+- [Active Context](./memory/active-context.md) — Current project state
+- [Architecture Decisions](./memory/architecture-decisions.md) — ADR log
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+├── src/          # Next.js application
+├── docs/         # Design documentation
+├── memory/       # Agent memory system (persistent context)
+└── cli/          # CLI logging tool (future)
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript 5 (strict) |
+| Styling | Tailwind CSS 4 |
+| Database | SQLite (MVP) / PostgreSQL (future) |
+| ORM | Drizzle |
+| State | Zustand |
+| AI | Vercel AI SDK + Ollama/OpenAI |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## MVP Features
 
-## Deploy on Vercel
+- [ ] Quick-log widget (<10s per entry)
+- [ ] GitHub-style heatmap visualization
+- [ ] Consistency scoring (replaces streaks)
+- [ ] Multi-domain support
+- [ ] Weekly auto-generated snapshots
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
