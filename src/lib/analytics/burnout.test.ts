@@ -2,8 +2,8 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vites
 import fs from "fs";
 import path from "path";
 import os from "os";
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "../db/schema";
 
 // ─── Schema DDL ─────────────────────────────────────────────────────────
@@ -486,7 +486,7 @@ describe("computeBurnoutRisk", () => {
   let tmpDir: string;
   let tempDbPath: string;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     // Fix current date to a Monday so week calculations are deterministic
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2025-01-06T12:00:00.000Z")); // Monday
@@ -494,7 +494,7 @@ describe("computeBurnoutRisk", () => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lqd-burnout-"));
     tempDbPath = path.join(tmpDir, "test.db");
     process.env.DB_PATH = tempDbPath;
-    createTables();
+    await createTables();
   });
 
   afterAll(() => {
@@ -505,22 +505,24 @@ describe("computeBurnoutRisk", () => {
     }
   });
 
-  function createTables() {
-    const sqlite = new Database(tempDbPath);
-    sqlite.pragma("journal_mode = WAL");
-    sqlite.pragma("foreign_keys = ON");
-    sqlite.exec(CREATE_TABLES_SQL);
-    sqlite.close();
+  async function createTables() {
+    const client = createClient({ url: `file:${tempDbPath}` });
+    for (const stmt of CREATE_TABLES_SQL.split(";").map(s => s.trim()).filter(Boolean)) {
+      await client.execute(stmt);
+    }
+    client.close();
   }
 
-  function clearData() {
-    const sqlite = new Database(tempDbPath);
-    sqlite.exec(CLEAR_DATA_SQL);
-    sqlite.close();
+  async function clearData() {
+    const client = createClient({ url: `file:${tempDbPath}` });
+    for (const stmt of CLEAR_DATA_SQL.split(";").map(s => s.trim()).filter(Boolean)) {
+      await client.execute(stmt);
+    }
+    client.close();
   }
 
-  beforeEach(() => {
-    clearData();
+  beforeEach(async () => {
+    await clearData();
   });
 
   /**
@@ -534,8 +536,8 @@ describe("computeBurnoutRisk", () => {
     maxValue: number,
     weekPatterns: Record<number, number>[], // one per week: { dayOfWeek: value }
   ) {
-    const sqlite = new Database(tempDbPath);
-    const ddb = drizzle(sqlite);
+    const client = createClient({ url: `file:${tempDbPath}` });
+    const ddb = drizzle(client);
 
     await ddb
       .insert(schema.domains)
@@ -573,7 +575,7 @@ describe("computeBurnoutRisk", () => {
       }
     }
 
-    sqlite.close();
+    client.close();
   }
 
   it("returns low risk for consistent high-engagement data", async () => {
