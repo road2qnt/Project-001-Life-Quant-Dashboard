@@ -12,10 +12,16 @@ if (!tursoUrl && !process.env.DB_PATH) {
   process.env.DB_PATH = "data.db";
 }
 
+// libSQL requires a URL scheme. Bare file paths need "file:" prefix.
+function toLibsqlUrl(rawPath: string): string {
+  if (/^(https?|libsql|file):/.test(rawPath)) return rawPath;
+  return `file:${rawPath}`;
+}
+
 const client = createClient(
   tursoUrl
     ? { url: tursoUrl, authToken: tursoAuthToken }
-    : { url: process.env.DB_PATH! }
+    : { url: toLibsqlUrl(process.env.DB_PATH!) }
 );
 
 export const db = drizzle(client, { schema });
